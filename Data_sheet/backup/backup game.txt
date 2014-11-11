@@ -1,0 +1,204 @@
+/********************************************************
+** main.c
+**
+** Batron  Example Program
+** Target: ATMEGA 128:: AVR-GCC
+**
+** Kajaani Amk
+** 25.5. 2012
+*	Näyttö kytketään STK500 
+*	PC0: Reset
+*	PC1: Sce 
+*	PC2: D / C
+*	PC3: SDin (Data)
+*	PC4: SCLK (Kello)
+**
+*******!!!!!!  Power 3.3c !!!!!******
+**
+**********************************************************/
+
+#define	true	1
+#define false	0
+#define	NB_SHOTS	4
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include <avr/pgmspace.h>
+#include <stdio.h>
+#include "lcd.h"
+
+int pos_x, pos_y, xG, yG, x, y;
+int int_flg = 0;
+
+typedef struct Shot Shot;
+struct Shot {
+
+	int xShot;
+	int yShot;
+	int step;
+	int frame;
+	char alive;
+
+};
+
+typedef char bool;
+
+ISR(TIMER0_OVF_vect)
+{
+	static int count = 0;
+
+	if(count++ == 16)
+	{
+		pos_x = ReadADC(0);		//  g = 482, -g = 207
+		pos_y = ReadADC(1);		//  g = 479, -g = 202
+
+		xG = (pos_x-510)>>5;
+		yG = (pos_y-493)>>7;
+
+		int_flg = 1;
+		count = 0;
+	}
+
+}
+
+Shot newShot() {
+	
+	Shot ret = {10 , 7 , 0 , 130 , true};
+	return ret;
+
+}
+
+void shotManagement(Shot * shot) {
+
+	(*shot).step++;
+/*
+
+	if ((*shot).step == 5) {
+		(*shot).step = 0;
+		(*shot).yShot--;
+	}
+
+	if ((*shot).yShot == -1)
+		(*shot).alive = false;
+
+*/
+
+	if ((*shot).step == 5) {
+		(*shot).step = 0;
+		(*shot).yShot--;
+	}
+
+	if ((*shot).yShot == -1)
+		(*shot).yShot = 8;
+}
+
+bool testCollision(Shot shot) {
+
+	if (shot.xShot >= x 
+		&& shot.xShot <= x + 5
+		&& shot.yShot == y)
+		return true;
+	else
+		return false;
+	
+}
+
+void InitADC()
+{
+	ADMUX=(1<<REFS0);    
+	ADCSRA=(1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0); //Rrescalar div factor =128
+}
+
+/* main */
+int main(void)
+{
+	// LCD - Display Init
+	lcd_init();
+
+	x = 0;
+	y = 0;
+
+	Shot tabShots[NB_SHOTS];
+	for (int i=0; i<NB_SHOTS; i++)		
+		tabShots[i] = newShot();
+
+	tabShots[1].xShot = 30;
+	tabShots[0].yShot = 6;
+	tabShots[2].xShot = 70;
+	tabShots[2].yShot = 5;
+	tabShots[3].xShot = 90;
+	tabShots[3].yShot = 8;
+
+
+	lcd_goto_xy(0,0);
+	
+	lcd_chr(129);
+
+	// Configure timer
+	// Prescaler = FCPU/1024
+	TCCR0|=(1<<CS02)|(1<<CS00);
+
+	//Enable Overflow Interrupt Enable
+	TIMSK|=(1<<TOIE0);
+
+	//Initialize Counter
+	TCNT0=0;
+
+	// PORTF input
+	DDRF = 0x00;
+
+	// init ADC
+	InitADC();
+
+	// interrupts
+	sei();
+		
+	while(1){
+
+		if(int_flg)
+		{
+			// clear old pos
+			lcd_goto_xy_exact(x,y);
+			lcd_chr(' ');
+			// clear old shot
+			for (int i=0; i<NB_SHOTS; i++) {
+				lcd_goto_xy_exact(tabShots[i].xShot,tabShots[i].yShot);
+				lcd_chr(' ');
+			}
+
+			// update pos
+			x+=xG;
+			y+=yG;
+
+			// make sure it fits screen
+			if(x<0)	x=0;
+			if(y<0)	y=0;
+
+			if(x>122)	x=122;
+			if(y>7)		y=7;
+
+			// print new pos
+			lcd_goto_xy_exact(x,y);
+			lcd_chr(129);
+
+			for (int i=0; i<NB_SHOTS; i++) {
+				if (tabShots[i].alive) {
+					shotManagement(&(tabShots[i]));
+					lcd_goto_xy_exact(tabShots[i].xShot,tabShots[i].yShot);
+					lcd_chr(tabShots[i].frame);
+				}
+
+				if (testCollision(tabShots[i])) {
+					lcd_clear();
+					lcd_goto_xy(7,3);
+					lcd_str("LOSER !");
+					while(1);
+				}
+			}
+
+			int_flg = 0;
+		}
+	
+	}
+}
