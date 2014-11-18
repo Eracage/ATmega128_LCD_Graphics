@@ -1,46 +1,41 @@
 /********************************************************
-** Kajaani Amk
-** Esko Haila & Aleksi Jokihaara
-** Muokattu: 28.10.2014
-**
-** Näyttö Batron  Joystick
-*	PC0: Reset
-*	PC1: Sce 
-*	PC2: D / C
-*	PC3: SDin (Data)
-*	PC4: SCLK (Kello)
-**
-** Alusta:
-** 	Opetukortti ATMEGA 128:: AVR-GCC
-**	Fuse Bits:0xFF, 0xB9, 0xE4
-**
-*************!!!!!!  Power 3.3c !!!!!*********************
-**
+
+	Kajaani Amk
+		Esko Haila
+		Aleksi Jokihaara
+		Mika Muhonen
+
+	Muokattu:
+		28.10.2014
+
+	Näyttö:
+		Batron
+
+	Joystick:
+		PC0: Reset
+		PC1: Sce 
+		PC2: D / C
+		PC3: SDin (Data)
+		PC4: SCLK (Kello)
+
+	Alusta:
+		Opetukortti ATMEGA 128:: AVR-GCC
+		Fuse Bits:0xFF, 0xB9, 0xE4
+
 **********************************************************/
-#define F_CPU 1000000UL	
+
+#define F_CPU 1000000UL
+
 #include <util/delay.h>
-
-#define	true	1
-#define false	0
-#define	NB_SHOTS	5
-#define STEP_MAX	1
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include <stdio.h>
+
 #include "lcd.h"
-#include "stdlib.h"
-#include "string.h"
-#include <math.h>
 
-float voltage=0;
-float intermed=0;
-unsigned long ADCresult;
+#include "graphics.h"
+#include "joystick.h"
 
-float voltage1=0;
-float temp=0;
-unsigned long ADCresult1;
 
 int x, y;
 
@@ -96,12 +91,9 @@ int debug;
 
 	while(1)
 	{
-		drawOutlines();
-
 		if ((~Switch & (1<<SW5)) != 0)
 		{
 			debug = 1-debug;
-			clearDebug();
 			_delay_ms(30);
 		}
 		if (debug == 1)
@@ -110,7 +102,6 @@ int debug;
 		if ((~Switch & (1<<SW3)) != 0)
 		{
 			joystick = 1-joystick;
-			clearDebug();
 			_delay_ms(30);
 		}
 
@@ -123,34 +114,6 @@ int debug;
 
 
 
-}
-
-void drawOutlines()
-{
-	lcd_goto_xy(1,0);
-	lcd_chr(148);
-	lcd_goto_xy(21,0);
-	lcd_chr(150);
-	lcd_goto_xy(21,7);
-	lcd_chr(152);
-	lcd_goto_xy(1,7);
-	lcd_chr(154);
-
-	for (int i = 2; i <=20; i++)
-	{
-		lcd_goto_xy(i,0);
-		lcd_chr(149);
-		lcd_goto_xy(i,7);
-		lcd_chr(153);
-	}
-
-	for (int i = 1; i < 7; i++)
-	{
-		lcd_goto_xy(21,i);
-		lcd_chr(151);
-		lcd_goto_xy(1,i);
-		lcd_chr(155);
-	}
 }
 
 void showDebug()
@@ -169,16 +132,6 @@ void showDebug()
 		lcd_goto_xy(7,2);
 		lcd_str(buf);
 	}
-}
-
-void clearDebug()
-{
-	lcd_goto_xy(7,1);
-	lcd_str("          ");
-	lcd_goto_xy(7,2);
-	lcd_str("          ");
-	lcd_goto_xy(7,3);
-	lcd_str("          ");
 }
 
 void readJoystick()

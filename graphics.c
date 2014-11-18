@@ -16,17 +16,16 @@ void Graphics_init()
 		}
 	}
 }
-
+// updates lcd display only where there are changes in the pixel buffer
 void Graphics_draw()
 {
+	// updates from left to right, 
 	for (char x = 0; x < WIDTH; ++x)
 	{
 		for (char y = 0; y < HEIGHT/GROUPSIZE; ++y)
 		{
-			const byte p0 = m_display[x][y][0];
-			const byte p1 = m_display[x][y][1];
-			const byte p2 = p0^p1;
-			if (p2)
+			// if the contents of the page (8 pixels) has changed, update the page on lcd display
+			if (m_display[x][y][0] != m_display[x][y][1])
 			{
 				Graphics_drawGroup(m_display[x][y][1]);
 
@@ -48,3 +47,9 @@ void Graphics_drawGroup(byte data)
 {
 	lcd_send(data, LCD_DATA);
 }
+
+void Graphics_inverseColors(char on_off)
+{
+
+}
+

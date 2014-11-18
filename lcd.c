@@ -172,10 +172,6 @@ void lcd_init(void)
 	lcd_send(0xAF, LCD_CMD);  	// Set Display ON
 	lcd_send(0xCC, LCD_CMD);  	// Set LCD to RAM mapping
 
-	//lcd_send(0xFF, LCD_DATA);	// 
-	//lcd_send(0x00, LCD_DATA);  	// Set Display ON
-	//lcd_send(0xFF, LCD_DATA);
-
 
 
 	//cd_send(0xA5, LCD_CMD);  // All pixel ON TESTIÄ
@@ -266,9 +262,6 @@ void lcd_pixel(char x, char y, char on)
 	const char cache = (char)lcdCacheData[(int)x][(int)page];
 
 	char output = on ? (1 << (y % 8)) | cache : ~(1 << (y % 8)) & cache;
-
-	//if (on)	output =  (1 << (y % 8)) | cache;
-	//else	output = ~(1 << (y % 8)) & cache;
 
 	lcd_goto_xy_exact(x, page);
 	lcd_send(output, LCD_DATA);
