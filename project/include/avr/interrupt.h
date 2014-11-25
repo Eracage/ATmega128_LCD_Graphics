@@ -36,6 +36,7 @@
 #define _AVR_INTERRUPT_H_
 
 #include <avr/io.h>
+#define __asm__
 
 #if !defined(__DOXYGEN__) && !defined(__STRINGIFY)
 /* Auxiliary macro for ISR_ALIAS(). */
@@ -65,7 +66,7 @@
     call overhead. */
 #define sei()
 #else  /* !DOXYGEN */
-# define sei()  __asm__ __volatile__ ("sei" ::)
+# define sei()
 #endif /* DOXYGEN */
 
 #if defined(__DOXYGEN__)
@@ -79,7 +80,7 @@
     call overhead. */
 #define cli()
 #else  /* !DOXYGEN */
-# define cli()  __asm__ __volatile__ ("cli" ::)
+# define cli()
 #endif /* DOXYGEN */
 
 
@@ -117,9 +118,8 @@
 #endif
 
 #ifdef __cplusplus
-#  define ISR(vector, ...)            \
-    extern "C" void vector (void) __attribute__ ((signal,__INTR_ATTRS)) __VA_ARGS__; \
-    void vector (void)
+	#define ISR() void dfjkjgrmeolgrmeogkmerkgnreigjhnejhnrejn()
+	#define ADC_vect void
 #else
 #  define ISR(vector, ...)            \
     void vector (void) __attribute__ ((signal,__INTR_ATTRS)) __VA_ARGS__; \
