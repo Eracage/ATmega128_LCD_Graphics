@@ -66,14 +66,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\graphics.c" />
-    <ClCompile Include="..\joystick.c" />
+    <ClCompile Include="..\display.c" />
+    <ClCompile Include="..\analog.c" />
     <ClCompile Include="..\lcd.c" />
     <ClCompile Include="..\main.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\graphics.h" />
-    <ClInclude Include="..\joystick.h" />
+    <ClInclude Include="..\display.h" />
+    <ClInclude Include="..\analog.h" />
     <ClInclude Include="..\lcd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
