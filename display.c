@@ -1,7 +1,10 @@
-#include "graphics.h"
+#include "display.h"
+
 #include "lcd.h"
 
-void Graphics_init()
+byte m_display[HEIGHT/GROUPSIZE][WIDTH][2];
+
+void Display_Init()
 {
 	lcd_init();						//Näytön alustus
 
@@ -17,17 +20,17 @@ void Graphics_init()
 	}
 }
 // updates lcd display only where there are changes in the pixel buffer
-void Graphics_draw()
+void Display_Update()
 {
 	// updates from left to right, 
-	for (char x = 0; x < WIDTH; ++x)
+	for (byte x = 0; x < WIDTH; ++x)
 	{
-		for (char y = 0; y < HEIGHT/GROUPSIZE; ++y)
+		for (byte y = 0; y < HEIGHT/GROUPSIZE; ++y)
 		{
 			// if the contents of the page (8 pixels) has changed, update the page on lcd display
 			if (m_display[x][y][0] != m_display[x][y][1])
 			{
-				Graphics_drawGroup(m_display[x][y][1]);
+				Display_DrawGroup(m_display[x][y][1]);
 
 				m_display[x][y][0] = m_display[x][y][1];
 			}
@@ -35,7 +38,7 @@ void Graphics_draw()
 	}
 }
 
-void Graphics_pixel(char x, char y, char on)
+void Display_Pixel(byte x, byte y, byte on)
 {
 	if (on)
 		m_display[x][y / GROUPSIZE][1] |=   1 << y % GROUPSIZE; 
@@ -43,13 +46,12 @@ void Graphics_pixel(char x, char y, char on)
 		m_display[x][y / GROUPSIZE][1] &= ~(1 << y % GROUPSIZE);
 }
 
-void Graphics_drawGroup(byte data)
+void Display_DrawGroup(byte data)
 {
 	lcd_send(data, LCD_DATA);
 }
 
-void Graphics_inverseColors(char on_off)
+void Graphics_InverseColors(byte on)
 {
 
 }
-

@@ -1,26 +1,26 @@
 /********************************************************
 
-	Kajaani Amk
-		Esko Haila
-		Aleksi Jokihaara
-		Mika Muhonen
+Kajaani Amk
+Esko Haila
+Aleksi Jokihaara
+Mika Muhonen
 
-	Muokattu:
-		28.10.2014
+Muokattu:
+28.10.2014
 
-	Näyttö:
-		Batron
+Näyttö:
+Batron
 
-	Joystick:
-		PC0: Reset
-		PC1: Sce 
-		PC2: D / C
-		PC3: SDin (Data)
-		PC4: SCLK (Kello)
+Joystick:
+PC0: Reset
+PC1: Sce 
+PC2: D / C
+PC3: SDin (Data)
+PC4: SCLK (Kello)
 
-	Alusta:
-		Opetukortti ATMEGA 128:: AVR-GCC
-		Fuse Bits:0xFF, 0xB9, 0xE4
+Alusta:
+Opetukortti ATMEGA 128:: AVR-GCC
+Fuse Bits:0xFF, 0xB9, 0xE4
 
 **********************************************************/
 
@@ -31,10 +31,8 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 
-#include "lcd.h"
-
-#include "graphics.h"
-#include "joystick.h"
+#include "display.h"
+#include "analog.h"
 
 
 int x, y;
@@ -47,7 +45,6 @@ int x, y;
 #define SW4 PD3
 #define SW5 PD4
 
-int joystick;
 int debug;
 
 
@@ -55,39 +52,22 @@ int debug;
 //typedef char bool;
 
 /********************************
-	main 
+main 
 
-	*******************************/
-	int main(void)
+*******************************/
+int main(void)
 {
-	int i;
-
 
 	//Kytkimet sisääntuloja
 	DDRD &= ~((1<<SW1) | (1<<SW2) | (1<<SW3) | (1<<SW4) | (1<<SW5));
 	debug = 1;
-	joystick = 1;
 
+	Analog_Init();
+	Display_Init();
 
-	ADCSRA |= 1<<ADPS2; 			//Esijakaja 64 -> Taajuus sopivaksi AD-muuntimelle
-	ADCSRA |= 1<<ADPS1;
-	ADMUX |=1<<ADLAR;				// ADC result left adjusted
-	ADMUX &=~(1<<REFS0);
-	ADMUX &= ~(1<<REFS1);			//Avcc(+5v) muuntimen referenssijännitteeksi
-	ADCSRA |= 1<<ADIE;				//ADC Interrupt Enable
-	ADCSRA |= 1<<ADEN;				//Käynnistetään AD-muunnin
-
-	sei();							//Sallitaan keskeytykset
-
-	lcd_init();						//Näytön alustus
-
-	lcd_clear();					//Näytön tyhjennys
-
-	x=1;							//Osoittimen aloituspiste
+//Osoittimen aloituspiste
+	x=1;							
 	y=0;
-
-	lcd_goto_xy(x,y);
-	lcd_chr(132);
 
 	while(1)
 	{
@@ -96,114 +76,13 @@ int debug;
 			debug = 1-debug;
 			_delay_ms(30);
 		}
-		if (debug == 1)
-			showDebug();
 
-		if ((~Switch & (1<<SW3)) != 0)
-		{
-			joystick = 1-joystick;
-			_delay_ms(30);
-		}
 
-		if (joystick)
-		{
-			readJoystick();
-			moveCursor();
-		}
 	}
 
 
 
 }
 
-void showDebug()
-{
-	char buf[15];
-
-	if (joystick)
-	{
-		sprintf(buf, "X=%.2f V", voltage);
-
-		lcd_goto_xy(7,1);
-		lcd_str(buf);
-
-		sprintf(buf, "Y=%.2f V", voltage1);
-
-		lcd_goto_xy(7,2);
-		lcd_str(buf);
-	}
-}
-
-void readJoystick()
-{
-	ADMUX &= ~(1<<MUX0);			//Valitaan AD-muuntimen MUXin ensimmäinen tulo
-	ADMUX &= ~(1<<MUX1);
-	ADCSRA |= 1<<ADSC;
-	_delay_ms(1);
-	voltage= ((intermed *5)/1024);	//Jännitteen laskukaava	
-
-	ADMUX |=1<<MUX0;
-	ADMUX &= ~(1<<MUX1);				//Valitaan AD-muuntimen MUXin toinen tulo
-	ADCSRA |= 1<<ADSC;
-	_delay_ms(1);
-	voltage1= ((intermed *5)/1024);	//Jännitteen laskukaava
-}
-
-void moveCursor()
-{
-	if (joystick)
-	{
-		if((voltage<2.4) & (x>1))	
-		{
-
-			x--;
-			lcd_goto_xy(x,y);				//Siirretään osoitinta x-akselilla vasemmalle
-			lcd_chr(132);
-			lcd_goto_xy(x+1,y);				//Tyhjennetään osoittimen edellinen paikka
-			lcd_str(" ");		
-		}
-
-		if((voltage>2.9) & (x<=20))
-		{
-			x++;
-			lcd_goto_xy(x,y);				//Siirretään osoitinta x-akselilla oikealle
-			lcd_chr(132);
-			lcd_goto_xy(x-1,y);
-			lcd_str(" ");
-		}
-
-		if((voltage1<2.4) & (y>0))
-		{
-			y--;
-			lcd_goto_xy(x,y);				//Siirretään osoitinta y-akselilla alaspäin
-			lcd_chr(132);
-			lcd_goto_xy(x,y+1);
-			lcd_str(" ");
-		}
-		if((voltage1>2.9) & (y<7))
-		{
-			y++;
-			lcd_goto_xy(x,y);				//Siirretään osoitinta y-akselilla ylöspäin
-			lcd_chr(132);
-			lcd_goto_xy(x,y-1);
-			lcd_str(" ");
-		}
-	}
-}
-
-ISR(ADC_vect)
-{
-	cli();						//Estetään keskeytykset
-
-	uint8_t theLowADC = (ADCL>>6);	// Luetaan AD-muuntimelta tuleva LSB ja bittien siirto
-	uint8_t theHighADC = ADCH;		// Luetaan AD-muuntimelta tuleva MSB
-
-	ADCresult = theLowADC | (theHighADC<<2);	//Yhdistetään AD-muuntimen LSB ja MSB ja bittien siirto
-	ADCresult = ADCresult & 0x03FF;				//Tuloksen maskaus
-	intermed = ADCresult;						
-
-	sei();										//Sallitaan keskeytykset
-	ADCSRA |= 1<<ADSC;							//Aloitetaan uusi muunnos			
-}
 
 
