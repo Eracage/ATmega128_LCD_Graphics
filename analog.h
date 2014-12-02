@@ -15,5 +15,7 @@ short Analog_ReadX();
 // Returns value between 0 and ADC_MAX
 short Analog_ReadY();
 
+Point Analog_Position();
+
 
 #endif

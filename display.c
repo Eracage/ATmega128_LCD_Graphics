@@ -14,10 +14,11 @@ void Display_Init()
 	{
 		for (byte x = 0; x < WIDTH; ++x)
 		{
-			m_display[y][x][0] = 0;
-			m_display[y][x][1] = 0;
+			m_display[y][x][0] = 1;
 		}
 	}
+
+	Display_Clear();
 }
 // updates lcd display only where there are changes in the pixel buffer
 void Display_Update()
@@ -51,7 +52,28 @@ void Display_DrawGroup(byte data)
 	lcd_send(data, LCD_DATA);
 }
 
-void Graphics_InverseColors(byte on)
+void Dixplay_InverseColors(byte on)
 {
 
+}
+
+void Display_Clear()
+{
+	int x,y;
+
+	for(y=0;y<8;y++){
+		lcd_send(0xB0|y, LCD_CMD);	// page j
+		lcd_send(0x10, LCD_CMD);
+		lcd_send(0x00, LCD_CMD);	// column 0
+
+
+		for(x=0;x<128;x++){
+			lcd_send(0x00, LCD_DATA);
+			m_display[y][x][1] = 0;
+		}
+	}
+
+	lcd_send(0xB0, LCD_CMD);	// page 0
+	lcd_send(0x10, LCD_CMD);
+	lcd_send(0x00, LCD_CMD);	// column 0
 }

@@ -13,7 +13,7 @@
 #define _NOKIALCD_H_
 
 /******************* Macros & define *******************/
-#define F_CPU 1000000UL
+#define F_CPU 8000000UL
 
 /**************** Functions prototypes *****************/
 

@@ -46,3 +46,11 @@ short Analog_ReadY()
 	_delay_ms(1);
 	return ADCresult;
 }
+
+Point Analog_Position()
+{
+	Point retVal;
+	retVal.x = Analog_ReadX();
+	retVal.y = Analog_ReadY();
+	return retVal;
+}

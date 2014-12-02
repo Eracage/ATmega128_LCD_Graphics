@@ -32,6 +32,7 @@ Fuse Bits:0xFF, 0xB9, 0xE4
 #include <util/delay.h>
 #include <avr/io.h>
 
+#include "analog.h"
 #include "switch.h"
 #include "led.h"
 
@@ -39,6 +40,8 @@ void main()
 {
 	EnableSwitch(SW_ALL);
 	EnableLED(LED_ALL);
+
+	Analog_Init();
 
 	while (1) // Main loop
 	{

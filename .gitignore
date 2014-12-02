@@ -4,3 +4,4 @@ project/Debug/*
 project/*.sdf
 project/*.opensdf
 *.ipch
+*.suo
