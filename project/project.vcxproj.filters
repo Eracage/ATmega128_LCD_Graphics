@@ -38,5 +38,11 @@
     <ClInclude Include="..\analog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\switch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\led.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

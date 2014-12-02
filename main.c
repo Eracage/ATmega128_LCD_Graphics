@@ -1,3 +1,4 @@
+
 /********************************************************
 
 Kajaani Amk
@@ -13,7 +14,7 @@ Batron
 
 Joystick:
 PC0: Reset
-PC1: Sce 
+PC1: Sce
 PC2: D / C
 PC3: SDin (Data)
 PC4: SCLK (Kello)
@@ -24,65 +25,28 @@ Fuse Bits:0xFF, 0xB9, 0xE4
 
 **********************************************************/
 
-#define F_CPU 1000000UL
+// Kellotaajuuden m‰‰ritelm‰ delay.h kirjastolle.
+// M‰‰ritelt‰v‰ ennen delay.h kirjaston lis‰yst‰
+#define F_CPU 8000000UL // 8Mhz
 
 #include <util/delay.h>
 #include <avr/io.h>
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
 
-#include "display.h"
-#include "analog.h"
+#include "switch.h"
+#include "led.h"
 
-
-int x, y;
-
-//M‰‰ritell‰‰n kytkimet 1-5
-#define Switch PIND
-#define SW1 PD0		// Painettaessa 0-tilassa
-#define SW2 PD1
-#define SW3 PD2
-#define SW4 PD3
-#define SW5 PD4
-
-int debug;
-
-
-
-//typedef char bool;
-
-/********************************
-main 
-
-*******************************/
-int main(void)
+void main()
 {
+	EnableSwitch(SW_ALL);
+	EnableLED(LED_ALL);
 
-	//Kytkimet sis‰‰ntuloja
-	DDRD &= ~((1<<SW1) | (1<<SW2) | (1<<SW3) | (1<<SW4) | (1<<SW5));
-	debug = 1;
-
-	Analog_Init();
-	Display_Init();
-
-//Osoittimen aloituspiste
-	x=1;							
-	y=0;
-
-	while(1)
+	while (1) // Main loop
 	{
-		if ((~Switch & (1<<SW5)) != 0)
-		{
-			debug = 1-debug;
-			_delay_ms(30);
-		}
-
-
+		if (IsPressed(SW_Left))        { TurnOn(LED_3);         _delay_ms(300); }
+		else if (IsPressed(SW_Down))   { TurnOn(LED_2);         _delay_ms(300); }
+		else if (IsPressed(SW_Right))  { TurnOn(LED_2 | LED_3); _delay_ms(300); }
+		else if (IsPressed(SW_Up))     { TurnOn(LED_1);         _delay_ms(300); }
+		else if (IsPressed(SW_Center)) { TurnOn(LED_1 | LED_3); _delay_ms(300); }
+		else TurnOff(LED_ALL);
 	}
-
-
-
 }
-
-
-
