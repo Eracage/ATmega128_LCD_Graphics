@@ -1,3 +1,5 @@
 disp.aws
 default
 project/Debug/*
+project/*.sdf
+project/*.opensdf
