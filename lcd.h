@@ -1,3 +1,4 @@
+
 /*********************************************************
 ** lcd.h
 **
@@ -7,6 +8,7 @@
 ** 
 ** Kajak.fi
 ***********************************************************/
+
 #ifndef _NOKIALCD_H_
 #define _NOKIALCD_H_
 
@@ -14,8 +16,6 @@
 #define F_CPU 1000000UL
 
 /**************** Functions prototypes *****************/
-//short ReadADC(unsigned char);
-
 
 /* Command type sent to the lcd */
 typedef enum { LCD_CMD  = 0, LCD_DATA = 1 } LcdCmdData;
@@ -61,6 +61,3 @@ void lcd_base_addr(void);
 void lcd_send(unsigned char data, LcdCmdData cd);
 
 #endif
-
-
-

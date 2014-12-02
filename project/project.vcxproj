@@ -75,6 +75,8 @@
     <ClInclude Include="..\display.h" />
     <ClInclude Include="..\analog.h" />
     <ClInclude Include="..\lcd.h" />
+    <ClInclude Include="..\led.h" />
+    <ClInclude Include="..\switch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
