@@ -30,7 +30,7 @@ void lcd_send(unsigned char data, LcdCmdData cd);
 int lcdCacheIdx;
 int lcdCacheIdy;
 
-int lcdCacheData[128][8];
+char lcdCacheData[128][8];
 
 /* Alphabet lookup */
 unsigned char PROGMEM font5x7 [][5] = {
@@ -261,13 +261,13 @@ void lcd_chr(char chr)
 void lcd_pixel(char x, char y, char on)
 {
 	const char page = y / 8;
-	const char cache = (char)lcdCacheData[(int)x][(int)page];
+	const char cache = lcdCacheData[x][page];
 
 	char output = on ? (1 << (y % 8)) | cache : ~(1 << (y % 8)) & cache;
 
 	lcd_goto_xy_exact(x, page);
 	lcd_send(output, LCD_DATA);
-	lcdCacheData[(int)x][(int)page] = (int)output;
+	lcdCacheData[x][page] = output;
 }
 
 /***********************************************

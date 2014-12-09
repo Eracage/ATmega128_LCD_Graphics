@@ -4,8 +4,8 @@
 // 128*64
 // first x = 4
 
-#define HEIGHT 128
-#define WIDTH 64
+#define HEIGHT 64
+#define WIDTH 128
 #define GROUPSIZE 8
 
 typedef unsigned char byte;
@@ -18,5 +18,9 @@ void Display_Update();
 
 // Sets the state of a single pixel in the frame buffer
 void Display_Pixel(byte x, byte y, byte on);
+
+void Dixplay_InverseColors(byte on);
+
+void Display_Clear();
 
 #endif

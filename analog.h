@@ -3,10 +3,15 @@
 
 #define ADC_MAX 1024
 
-typedef struct Point
+typedef struct
 {
 	short x, y;
-} Point;
+} Pointi;
+
+typedef struct
+{
+	float x, y;
+} Pointf;
 
 void Analog_Init();
 
@@ -15,7 +20,9 @@ short Analog_ReadX();
 // Returns value between 0 and ADC_MAX
 short Analog_ReadY();
 
-Point Analog_Position();
+Pointi Analog_GetPositioni();
+
+Pointf Analog_GetPositionf();
 
 
 #endif

@@ -47,10 +47,18 @@ short Analog_ReadY()
 	return ADCresult;
 }
 
-Point Analog_Position()
+Pointi Analog_GetPositioni()
 {
-	Point retVal;
+	Pointi retVal;
 	retVal.x = Analog_ReadX();
 	retVal.y = Analog_ReadY();
+	return retVal;
+}
+
+Pointf Analog_GetPositionf()
+{
+	Pointf retVal;
+	retVal.x = (float)Analog_ReadX() / ADC_MAX;
+	retVal.y = (float)Analog_ReadY() / ADC_MAX;
 	return retVal;
 }
